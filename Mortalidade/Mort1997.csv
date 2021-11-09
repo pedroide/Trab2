@@ -1,0 +1,18 @@
+ Renda média domiciliar per capita - Brasil
+Renda média domic. per capita por Região
+Período:1991, 2000, 2010
+"Região";"Renda_média_domic._per_capita"
+"1 Região Norte";382,53
+"2 Região Nordeste";325,94
+"3 Região Sudeste";748,36
+"4 Região Sul";674,96
+"5 Região Centro-Oeste";706,18
+"Total";587,48
+ Fonte: IBGE - Censos Demográficos
+ Notas:
+ 
+ O salário mínimo do último ano para o qual a série está sendo calculada torna-se a referência para toda a série. Esse valor é corrigido
+ para todos com base no INPC de julho de 2010, alterando o valor da linha de pobreza e consequentemente a proporção de pobres.
+ Nesta tabela, o valor de referência, salário mínimo de 2010, é de R$ 510,00.
+ 
+ Consulte o sítio do IBGE para mais informações.
