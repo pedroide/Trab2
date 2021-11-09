@@ -45,7 +45,7 @@ for (i in seq_along(list.files(paste(getwd(),"/FE",sep = ""), pattern = "PopFE",
 Pop <- lpops[[1]]
 
 for (i in seq_along(lpops)) {
-  Pop <- left_join(Pop,lpops[[i+1]], by = c("M_cod", "M_name"))
+  Pop <- left_join(Pop,lpops[[i+1]])
 }
 
 Pop <- Pop %>% pivot_longer(4:ncol(Pop), names_to = "Ano", values_to = "Valor", values_drop_na = FALSE) %>% 
