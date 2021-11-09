@@ -40,6 +40,3 @@ for (i in seq_along(list.files(paste(getwd(),"/FE",sep = ""), pattern = "PopFE",
 
 }
 
-Pop <- tibble(M_cod = unique(unname(unlist(lapply(lpops[1:20],"[",1)))),
-              
-              )
