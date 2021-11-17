@@ -2,6 +2,7 @@ library(tidyverse)
 library(haven)
 library(stargazer)
 library(reshape)
+library(plm)
 
 ###Questão 1----------------------------
 
@@ -131,22 +132,91 @@ base <- base[,-c(11:13,22:24)] %>%
   mutate(Pop_maior60 = rowSums(base[,11:13]),
          
          Obitos_maior60 = rowSums(base[,22:24])
-  )
+  ) %>% 
+  
+  relocate(`Pop_maior60`, .before = `Pop_Total`) %>% 
+  relocate(`Obitos_maior60`, .before = `Obitos_Total`)
 
-#FALTA REORDENAR AS COLUNAS QUE CRIOU ACIMA
+base[is.na(base) == TRUE] <- 0
 
 ###Questão 2----------------------------
 
 #Criando as variáveis pedidas
 
-base <- base %>% mutate(txobitos_total = (Obitos_Total / Pop_Total),
-                        txobitos_menor1 = (( / ) * 100.000),
-                        txobitos_1a4 = (( / ) * 100.000),
-                        txobitos_15a19 = (( / ) * 100.000),
-                        txobitos_20a29 = (( / ) * 100.000),
-                        txobitos_30a39 = (( / ) * 100.000),
-                        txobitos_40a49 = (( / ) * 100.000),
-                        txobitos_50a59 = (( / ) * 100.000),
-                        txobitos_maior60 = (( / ) * 100.000),
-                        )
+tabmun <- readxl::read_xls(list.files(pattern = "RELATORIO")) %>% 
+  select(c("UF","Nome_UF")) %>% 
+  type.convert() %>% 
+  distinct()
+
+base <- base %>% mutate(txobitos_total = ifelse(`Pop_Total` == 0, 0, (`Obitos_Total` / `Pop_Total`)*100000),
+                    txobitos_menor1 = (ifelse( `Pop_Menor 1 ano` == 0, 0, ( `Obitos_Menor 1 ano` / `Pop_Menor 1 ano` ) * 1000)),
+                    txobitos_1a4 = (ifelse( `Pop_1 a 4 anos` == 0, 0, ( `Obitos_1 a 4 anos` / `Pop_1 a 4 anos` ) * 1000)),
+                    txobitos_15a19 = (ifelse( `Pop_15 a 19 anos` == 0, 0, ( `Obitos_15 a 19 anos` / `Pop_15 a 19 anos` ) * 100000)),
+                    txobitos_20a29 = (ifelse( `Pop_20 a 29 anos` == 0, 0, ( `Obitos_20 a 29 anos` / `Pop_20 a 29 anos` ) * 100000)),
+                    txobitos_30a39 = (ifelse( `Pop_30 a 39 anos` == 0, 0, ( `Obitos_30 a 39 anos` / `Pop_30 a 39 anos` ) * 100000)),
+                    txobitos_40a49 = (ifelse( `Pop_40 a 49 anos` == 0, 0, ( `Obitos_40 a 49 anos` / `Pop_40 a 49 anos` ) * 100000)),
+                    txobitos_50a59 = (ifelse( `Pop_50 a 59 anos` == 0, 0, ( `Obitos_50 a 59 anos` / `Pop_50 a 59 anos` ) * 100000)),
+                    txobitos_maior60 = (ifelse( `Pop_maior60` == 0, 0, ( `Obitos_maior60` / `Pop_maior60` ) * 100000)),
+
+                    cob = ( `n_cadastrados` / `Pop_Total` ),
+                    
+                    psf = ifelse(base$n_cadastrados != 0, 1, 0),
+                    
+                    UF = as.numeric(substr(base$M_cod,1,2))
+                    )
+
+base <- left_join(base, tabmun, by = "UF") %>% 
+  relocate(c("UF","Nome_UF"), .before = "Ano")
+
+
+
+###Questão 3-------------------------------------
+
+faixas <- substring(names(base[,6:14]),5)
+faixas <- c(faixas[9],faixas[-9])
+
+vind <- colnames(base[,25:33])
+
+q3regs <- list()
+
+for (i in seq_along(faixas)) {
+
+  q3reg <- plm(paste(vind[i],"~ cob"), data = base,
+               index = c("M_cod","Ano"),
+               model = "within",
+               effect = "twoways"
+               )
+  
+  q3regs[[i]] <- q3reg
+  
+  names(q3regs)[i] <- faixas[i]
+    
+}
+
+for (i in seq_along(faixas)) {
+  
+  q3reg <- plm(paste(vind[i],"~ cob"), data = base,
+               index = c("M_cod","Ano"),
+               model = "within",
+               effect = "twoways",
+               na.rm = TRUE)
+  
+  q3regs[[i]] <- q3reg
+  
+  names(q3regs)[i] <- faixas[i]
+  
+}
+
+#ENTENDER ESSE NEGOCIO DE TWO WAYS
+ 
+
+###Questão 4-------------------------------------
+
+
+
+###Questão 5-------------------------------------
+
+
+
+###Questão 6-------------------------------------
 
